@@ -25,17 +25,34 @@ function getBangkokDateTime() {
 }
 
 async function ensureHeader(sheets) {
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A1:F1`,
-  });
-  if (!res.data.values || res.data.values.length === 0) {
-    await sheets.spreadsheets.values.update({
+  try {
+    const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A1`,
-      valueInputOption: 'RAW',
-      resource: { values: [HEADER] },
+      range: `${SHEET_NAME}!A1:F1`,
     });
+    if (!res.data.values || res.data.values.length === 0) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SHEET_ID,
+        range: `${SHEET_NAME}!A1`,
+        valueInputOption: 'RAW',
+        resource: { values: [HEADER] },
+      });
+    }
+  } catch (err) {
+    if (err.message && err.message.includes('Unable to parse range')) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: SHEET_ID,
+        resource: { requests: [{ addSheet: { properties: { title: SHEET_NAME } } }] },
+      });
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SHEET_ID,
+        range: `${SHEET_NAME}!A1`,
+        valueInputOption: 'RAW',
+        resource: { values: [HEADER] },
+      });
+    } else {
+      throw err;
+    }
   }
 }
 
