@@ -1,7 +1,7 @@
 const { google } = require('googleapis');
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
-const SHEET_NAME = 'รายการ';
+const SHEET_NAME = 'Expenses';
 const HEADER = ['วันที่', 'เวลา', 'ประเภท', 'หมวดธุรกิจ', 'รายละเอียด', 'จำนวนเงิน'];
 
 function getAuth() {
